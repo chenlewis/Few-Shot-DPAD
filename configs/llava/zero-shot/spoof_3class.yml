@@ -1,0 +1,21 @@
+---
+experiment:
+  # Override these via run_train.sh env vars or CLI flags (no machine-local paths in repo)
+  data_dir: ''
+  dataset: 'spoof_detection'
+  # Source / target JSONs are usually overridden by run_train.sh
+  dataset_json_paths: ''
+  dataset_json_paths2: ''
+  target_support_json: ''
+model_params:
+  model_base: ''
+training:
+  eval_val_every: 1
+  # Optional warm-start / resume checkpoint; null = train from CLIP+ViT init
+  load: null
+  max_epochs: 50
+  batch_size: 32
+  test_batch_size: 96
+  test_set: test
+  topk: 1
+  workers: 8
