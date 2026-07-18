@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Experiment outputs / large checkpoints (weights live outside this repo)
+logs/
+*.t7
+*.pth
+*.pt
+!**/cmat.pt
