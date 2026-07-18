@@ -1,6 +1,6 @@
 """
 FECLIP: Forensics-Expert CLIP with Prompt Learning & PCGrad
-核心模型 —— 基于 CLIP + ViT Forensic Expert 的多模态融合分类器
+Core model — multimodal fusion classifier based on CLIP + ViT Forensic Expert.
 """
 import math
 import torch
@@ -18,13 +18,13 @@ except ImportError:
 
 
 # =========================================================================
-# 1. TorchvisionVitExpert — torchvision ViT-B/16 作为取证特征专家
+# 1. TorchvisionVitExpert — torchvision ViT-B/16 as forensic feature expert
 # =========================================================================
 class TorchvisionVitExpert(nn.Module):
     def __init__(self, pretrained: bool = True, out_indices: Tuple[int, ...] = (2, 3),
                  img_size: int = 224, local_ckpt: Optional[str] = None):
         super().__init__()
-        assert vit_b_16 is not None, "torchvision 未安装或版本过低"
+        assert vit_b_16 is not None, "torchvision is not installed or too old"
 
         if pretrained:
             self.vit = vit_b_16(weights=ViT_B_16_Weights.IMAGENET1K_V1)
@@ -127,7 +127,7 @@ class TorchvisionVitExpert(nn.Module):
 
 
 # =========================================================================
-# 2. VisionFusionAdapter — CLIP + Forensic Expert 视觉融合
+# 2. VisionFusionAdapter — CLIP + Forensic Expert visual fusion
 # =========================================================================
 class VisionFusionAdapter(nn.Module):
     def __init__(self, clip_vision_model, clip_visual_projection, get_forensic_feats,
@@ -198,7 +198,7 @@ class VisionFusionAdapter(nn.Module):
 
 
 # =========================================================================
-# 3. PromptLearner — CoOp 可学习上下文向量
+# 3. PromptLearner — CoOp learnable context vectors
 # =========================================================================
 class PromptLearner(nn.Module):
     def __init__(self, args, classnames, clip_model, tokenizer):
@@ -250,7 +250,7 @@ class PromptLearner(nn.Module):
 
 
 # =========================================================================
-# 4. FECLIP 主模型
+# 4. FECLIP main model
 # =========================================================================
 class FECLIP(nn.Module):
     def __init__(self, dset, classnames, args, model=None, tokenizer=None, few_shot=False):
