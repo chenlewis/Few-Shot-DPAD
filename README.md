@@ -1,6 +1,14 @@
-# FE-CLIP: Forensics-Expert CLIP with Prompt Learning
+# Few-Shot-DPAD
 
-A multimodal few-shot cross-domain image classification framework based on CLIP + ViT Forensic Expert, with PCGrad gradient projection and Margin Weight uncertainty weighting.
+Official code for **Few-Shot Bona-fide Adaptation for Document Presentation Attack Detection through Realistic Recapture Synthesis**.
+
+This repository implements FE-CLIP: a multimodal few-shot cross-domain framework for document presentation attack detection (DPAD), based on CLIP + ViT Forensic Expert, with PCGrad gradient projection and Margin Weight uncertainty weighting.
+
+## Paper
+
+> **Few-Shot Bona-fide Adaptation for Document Presentation Attack Detection through Realistic Recapture Synthesis**
+
+If you use this code, please cite the paper above.
 
 ## Installation
 
