@@ -1,51 +1,51 @@
 # FE-CLIP: Forensics-Expert CLIP with Prompt Learning
 
-基于 CLIP + ViT Forensic Expert 的多模态 Few-shot 跨域图像分类框架，使用 PCGrad 梯度投影 + Margin Weight 不确定性加权。
+A multimodal few-shot cross-domain image classification framework based on CLIP + ViT Forensic Expert, with PCGrad gradient projection and Margin Weight uncertainty weighting.
 
-## 环境安装
+## Installation
 
 ```bash
 conda activate llamp
-# 或新建环境:
+# Or create a new environment:
 # conda create -n feclip python=3.11 pip && conda activate feclip
 pip install -r requirements.txt
 ```
 
-主要依赖: `torch`, `transformers`, `peft`, `torchvision`
+Main dependencies: `torch`, `transformers`, `peft`, `torchvision`
 
-## 预训练权重
+## Pretrained Weights
 
-发布权重托管在 Hugging Face：
+Released weights are hosted on Hugging Face:
 
 - **Model**: [https://huggingface.co/willingSZU/Few-Shot-DPAD](https://huggingface.co/willingSZU/Few-Shot-DPAD)
 
 ```bash
-# 下载到本地 checkpoints 目录
+# Download to a local checkpoints directory
 huggingface-cli download willingSZU/Few-Shot-DPAD --local-dir ./checkpoints
-# 或设置 WEIGHT_ROOT 指向下载目录
+# Or point WEIGHT_ROOT to the download directory
 export WEIGHT_ROOT=./checkpoints
 ```
 
-## 项目结构
+## Project Structure
 
 ```
-Few-Shot-DPAD/                   # 代码
+Few-Shot-DPAD/                   # Code
 ├── train.py / test.py
 ├── run_train.sh / run_test.sh
 ├── models/ / data/ / utils/ / configs/
-checkpoints/                     # 权重（从 Hugging Face 下载，与代码分离）
+checkpoints/                     # Weights (downloaded from Hugging Face; kept separate from code)
 └── FE-CLIP_<dataset>_.../fusion_Cert/
     ├── ckpt_best_*.t7
     ├── ckpt_last_*.t7
     └── args_all.yaml
 ```
 
-默认权重目录: `../checkpoints`（相对本仓库）  
-可通过环境变量 `WEIGHT_ROOT` 或参数 `--cv_dir` 覆盖。
+Default weight directory: `../checkpoints` (relative to this repo).  
+Override via the `WEIGHT_ROOT` environment variable or the `--cv_dir` argument.
 
-## 训练
+## Training
 
-数据路径需通过环境变量传入（仓库中不包含本机绝对路径）：
+Data paths must be provided via environment variables (no machine-specific absolute paths are committed):
 
 ```bash
 SOURCE_JSON=/path/to/source.json \
@@ -53,14 +53,14 @@ TARGET_SUPPORT=/path/to/target_support.json \
 TARGET_TEST=/path/to/target_test.json \
 bash run_train.sh
 
-# 自定义参数
+# Custom parameters
 GPUS=0 DATASET=spoof_detection TRAIN_STAGE=fusion NUM_SHOTS=5 \
 SOURCE_JSON=/path/to/source.json \
 TARGET_SUPPORT=/path/to/support.json \
 TARGET_TEST=/path/to/test.json \
 bash run_train.sh
 
-# 直接调用
+# Direct invocation
 python train.py \
     --config configs/llava/zero-shot/spoof_3class.yml \
     --dataset spoof_detection --train_stage fusion \
@@ -72,31 +72,31 @@ python train.py \
     --dataset_json_paths2 /path/to/target_test.json
 ```
 
-### 训练阶段
+### Training Stages
 
-| Stage | 说明 |
-|-------|------|
-| `clip` | 仅训练 CLIP 分支 (Prompt + LoRA) |
-| `fusion` | 训练融合模块 + LoRA Co-tuning（默认） |
-| `joint` | 联合训练所有模块 |
+| Stage | Description |
+|-------|-------------|
+| `clip` | Train CLIP branch only (Prompt + LoRA) |
+| `fusion` | Train fusion module + LoRA co-tuning (default) |
+| `joint` | Jointly train all modules |
 
-## 测试
+## Testing
 
 ```bash
-# 指定权重目录与测试集
+# Specify weight directory and test set
 bash run_test.sh ./checkpoints/FE-CLIP_CERT_25Shot_fusion_lr2e-5_s1/fusion_Cert /path/to/test.json
 
-# 或用环境变量
+# Or use environment variables
 DEFAULT_TEST_JSON=/path/to/test.json bash run_test.sh <WEIGHT_DIR>/fusion_Cert
 
-# 不传 logpath 则自动选 WEIGHT_ROOT 下最新实验（仍需提供 test_json）
+# If logpath is omitted, the latest experiment under WEIGHT_ROOT is selected (test_json is still required)
 DEFAULT_TEST_JSON=/path/to/test.json bash run_test.sh
 ```
 
-## 核心特性
+## Key Features
 
-- **PCGrad**: 按 domain × difficulty 分组投影梯度，减少梯度冲突
-- **Margin Weight**: Top-2 熵不确定性加权
-- **Source + Target 混合训练**: Few-shot 跨域泛化
-- **纯 PyTorch**: FSDP/DDP，无 DeepSpeed
-- **轻量 Checkpoint**: 仅保存 LoRA + Fusion 参数
+- **PCGrad**: Project gradients grouped by domain × difficulty to reduce conflicts
+- **Margin Weight**: Top-2 entropy uncertainty weighting
+- **Source + Target mixed training**: Few-shot cross-domain generalization
+- **Pure PyTorch**: FSDP/DDP, no DeepSpeed
+- **Lightweight checkpoints**: Save LoRA + Fusion parameters only
