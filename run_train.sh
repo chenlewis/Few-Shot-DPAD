@@ -1,32 +1,32 @@
 #!/bin/bash
 # ============================================================
 # FE-CLIP Training Script
-# 使用 PCGrad + Margin Weight 的 Few-shot 跨域训练
+# Few-shot cross-domain training with PCGrad + Margin Weight
 # ============================================================
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ---- 基础配置 ----
+# ---- Basic config ----
 GPUS=${GPUS:-0}                    # GPU IDs
 DATASET=${DATASET:-spoof_detection}
 CONFIG=${CONFIG:-configs/llava/zero-shot/spoof_3class.yml}
 SEED=${SEED:-1}
 
-# ---- 训练超参 ----
+# ---- Training hyperparameters ----
 LR=${LR:-2e-5}
 BATCH_SIZE=${BATCH_SIZE:-32}
 MAX_EPOCHS=${MAX_EPOCHS:-50}
 EVAL_EVERY=${EVAL_EVERY:-1}
 TEST_BATCH_SIZE=${TEST_BATCH_SIZE:-96}
 
-# ---- Stage 选择 ----
-# clip:   只用 CLIP 分支训练
-# fusion: 训练 CLIP + Forensics Expert 融合（默认）
-# joint:  联合训练
+# ---- Stage selection ----
+# clip:   Train CLIP branch only
+# fusion: Train CLIP + Forensics Expert fusion (default)
+# joint:  Joint training
 TRAIN_STAGE=${TRAIN_STAGE:-fusion}
 
-# ---- Few-shot 配置 ----
+# ---- Few-shot config ----
 NUM_SHOTS=${NUM_SHOTS:-5}
 NUM_PRIOR=${NUM_PRIOR:-100}
 LLM_DEPTH=${LLM_DEPTH:-9}
@@ -34,8 +34,8 @@ LLM_PROMPTS=${LLM_PROMPTS:-32}
 TEXT_CTX=${TEXT_CTX:-4}
 VIS_CTX=${VIS_CTX:-4}
 
-# ---- 数据路径（请通过环境变量覆盖，勿提交本机绝对路径）----
-# 示例:
+# ---- Data paths (override via env vars; do not commit machine-specific absolute paths) ----
+# Example:
 #   SOURCE_JSON=/path/to/source.json \
 #   TARGET_SUPPORT=/path/to/target_support.json \
 #   TARGET_TEST=/path/to/target_test.json \
@@ -54,19 +54,19 @@ if [ -z "$SOURCE_JSON" ] || [ -z "$TARGET_SUPPORT" ] || [ -z "$TARGET_TEST" ]; t
     exit 1
 fi
 
-# ---- 其他 ----
+# ---- Other ----
 DISTILL_TYPE=${DISTILL_TYPE:-soft}
 LAMBDA_DIST=${LAMBDA_DIST:-1.0}
 USE_MARGIN_WEIGHT=${USE_MARGIN_WEIGHT:-True}   # PCGrad margin weight
 
-# ---- 权重保存目录 ----
-# 预训练/发布权重托管于 Hugging Face:
+# ---- Checkpoint directory ----
+# Released/pretrained weights are hosted on Hugging Face:
 #   https://huggingface.co/willingSZU/Few-Shot-DPAD
-# 下载示例:
+# Download example:
 #   huggingface-cli download willingSZU/Few-Shot-DPAD --local-dir ./checkpoints
 WEIGHT_ROOT=${WEIGHT_ROOT:-"${SCRIPT_DIR}/../checkpoints"}
 
-# ---- 自动生成实验名 ----
+# ---- Auto-generate experiment name ----
 EXP_NAME="FE-CLIP_${DATASET}_${NUM_SHOTS}Shot_${TRAIN_STAGE}_lr${LR}_s${SEED}"
 
 echo "============================================"
